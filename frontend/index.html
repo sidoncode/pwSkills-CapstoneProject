@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DevOps Accelerator Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'devops-blue': '#1e3a8a',
+            'devops-dark': '#1f2937',
+            'devops-green': '#10b981',
+            'devops-light': '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-devops-light">
+
+  <!-- Navigation -->
+  <nav class="bg-devops-dark shadow-lg fixed w-full top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <i class="fas fa-code-branch text-devops-green text-2xl mr-3"></i>
+          <span class="text-white text-xl font-bold">DevOps Mentorship</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#home" class="text-gray-300 hover:text-devops-green transition-colors">Home</a>
+          <a href="#upload" class="text-gray-300 hover:text-devops-green transition-colors">Upload Payment</a>
+          <a href="#tools" class="text-gray-300 hover:text-devops-green transition-colors">Smart Tools</a>
+          <button class="bg-devops-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+            Start Learning
+          </button>
+        </div>
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-btn" class="text-gray-300 hover:text-white">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-devops-dark border-t border-gray-700">
+      <div class="px-2 pt-2 pb-3 space-y-1">
+        <a href="#home" class="block px-3 py-2 text-gray-300 hover:text-devops-green">Home</a>
+        <a href="#upload" class="block px-3 py-2 text-gray-300 hover:text-devops-green">Upload Payment</a>
+        <a href="#tools" class="block px-3 py-2 text-gray-300 hover:text-devops-green">Smart Tools</a>
+        <button class="w-full text-left bg-devops-green text-white px-3 py-2 rounded-lg hover:bg-green-600 transition-colors mt-2">
+          Start Learning
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="pt-20 pb-16 bg-gradient-to-br from-devops-blue to-devops-dark">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2">
+          DevOps Accelerator Platform
+        </h1>
+        <div class="text-devops-green text-xl md:text-2xl font-semibold mb-6">
+          - Built for DevOps community with passion!
+        </div>
+        <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          Master DevOps with personalized mentorship from Mohammad Anees Alam.<br>
+          Learn industry best practices through hands-on projects, real-world scenarios, and expert guidance throughout your journey.<br>
+          Transform your career with practical DevOps skills.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DevOps Topics Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-devops-dark mb-4">DevOps Topics I Cover</h2>
+        <p class="text-gray-600 text-lg">Comprehensive curriculum covering all essential DevOps practices</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-devops-green text-3xl mb-4">
+            <i class="fas fa-infinity"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-devops-dark mb-3">CI/CD Pipelines</h3>
+          <p class="text-gray-600">Build automated deployment pipelines with Jenkins, GitLab CI, and GitHub Actions</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-devops-green text-3xl mb-4">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-devops-dark mb-3">Infrastructure as Code</h3>
+          <p class="text-gray-600">Master Terraform, Ansible, and CloudFormation for scalable infrastructure</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-devops-green text-3xl mb-4">
+            <i class="fab fa-docker"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-devops-dark mb-3">Containerization</h3>
+          <p class="text-gray-600">Docker, Kubernetes, and container orchestration best practices</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-devops-green text-3xl mb-4">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-devops-dark mb-3">Monitoring & Logging</h3>
+          <p class="text-gray-600">Prometheus, Grafana, ELK Stack, and observability strategies</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-devops-green text-3xl mb-4">
+            <i class="fas fa-cloud"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-devops-dark mb-3">Cloud Platforms</h3>
+          <p class="text-gray-600">AWS, Azure, GCP services and cloud-native architectures</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-devops-green text-3xl mb-4">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-devops-dark mb-3">Security & Compliance</h3>
+          <p class="text-gray-600">DevSecOps practices, security scanning, and compliance automation</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-devops-dark mb-4">What Students Say</h2>
+        <p class="text-gray-600 text-lg">Success stories from DevOps professionals</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-devops-green rounded-full flex items-center justify-center text-white font-bold">
+              S
+            </div>
+            <div class="ml-4">
+              <h4 class="font-semibold text-devops-dark">Sarah Johnson</h4>
+              <p class="text-gray-600 text-sm">DevOps Engineer at TechCorp</p>
+            </div>
+          </div>
+          <p class="text-gray-700">"Mohammad's mentorship transformed my career. The hands-on approach and real-world projects gave me the confidence to land my dream DevOps role."</p>
+          <div class="flex text-yellow-400 mt-4">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-devops-green rounded-full flex items-center justify-center text-white font-bold">
+              M
+            </div>
+            <div class="ml-4">
+              <h4 class="font-semibold text-devops-dark">Mike Rodriguez</h4>
+              <p class="text-gray-600 text-sm">Senior DevOps at StartupXYZ</p>
+            </div>
+          </div>
+          <p class="text-gray-700">"The CI/CD pipeline course was exceptional. I implemented everything I learned and reduced our deployment time by 80%."</p>
+          <div class="flex text-yellow-400 mt-4">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-devops-green rounded-full flex items-center justify-center text-white font-bold">
+              L
+            </div>
+            <div class="ml-4">
+              <h4 class="font-semibold text-devops-dark">Lisa Chen</h4>
+              <p class="text-gray-600 text-sm">Cloud Architect at BigTech</p>
+            </div>
+          </div>
+          <p class="text-gray-700">"Perfect blend of theory and practice. The Kubernetes deep-dive helped me architect our entire microservices platform."</p>
+          <div class="flex text-yellow-400 mt-4">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guidance Section -->
+  <div id="career-bot" class="max-w-3xl mx-auto my-12 p-8 bg-white rounded-xl shadow-lg text-center">
+    <h2 class="text-2xl md:text-3xl font-bold text-devops-dark mb-6">
+      Your Background, Our Guidance — Let's Begin!
+    </h2>
+    <p style="font-size: 18px; color: #555555; margin-bottom: 25px;">
+      Choose Where You're Coming From — Discover Where You Can Go!
+    </p>
+
+    <div class="flex justify-center flex-wrap gap-4">
+      <button onclick="showBotInfo('student')" class="px-6 py-3 rounded-md bg-gray-100 hover:bg-gray-200 transition duration-200">
+        🎓 Student
+      </button>
+      <button onclick="showBotInfo('nonit')" class="px-6 py-3 rounded-md bg-gray-100 hover:bg-gray-200 transition duration-200">
+        🧑‍🔧 Non-IT Professional
+      </button>
+      <button onclick="showBotInfo('it')" class="px-6 py-3 rounded-md bg-gray-100 hover:bg-gray-200 transition duration-200">
+        💼 IT Background
+      </button>
+    </div>
+
+    <div id="bot-response" class="mt-8 text-left text-base leading-relaxed"></div>
+  </div>
+
+
+  <!-- Upload Screenshot Section -->
+  <section id="upload" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-devops-dark mb-4">Upload Payment Screenshot</h2>
+        <p class="text-gray-600 text-lg">Upload your payment confirmation to get started with your mentorship</p>
+      </div>
+      <div class="bg-gray-50 p-8 rounded-xl shadow-lg">
+        <form id="upload-form" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-devops-dark mb-2">Full Name</label>
+              <input type="text" id="fullName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-devops-green focus:border-transparent" placeholder="Enter your full name" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-devops-dark mb-2">Email Address</label>
+              <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-devops-green focus:border-transparent" placeholder="Enter your email" required>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-devops-dark mb-2">Payment Screenshot</label>
+            <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-devops-green transition-colors cursor-pointer">
+              <div id="upload-content">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600 mb-2">Click to upload or drag and drop</p>
+                <p class="text-sm text-gray-500">JPG, PNG, or PDF (max 10MB)</p>
+                <!-- Show selected file name here -->
+                <p class="text-sm text-gray-700 mt-2" id="selected-file-name" style="display:none;"></p>
+              </div>
+              <div id="upload-progress" class="hidden">
+                <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div id="progress-bar" class="bg-devops-green h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p class="text-devops-green font-medium">Uploading... <span id="progress-text">0%</span></p>
+              </div>
+              <div id="upload-success" class="hidden">
+                <i class="fas fa-check-circle text-4xl text-devops-green mb-4"></i>
+                <p class="text-devops-green font-medium">Upload successful!</p>
+                <p class="text-sm text-gray-600" id="file-name"></p>
+              </div>
+              <div id="upload-error" class="hidden">
+                <i class="fas fa-times-circle text-4xl text-red-500 mb-4"></i>
+                <p class="text-red-500 font-medium" id="error-message"></p>
+              </div>
+            </div>
+            <input type="file" id="file-input" class="hidden" accept=".jpg,.jpeg,.png,.pdf">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-devops-dark mb-2">Additional Notes (Optional)</label>
+            <textarea id="notes" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-devops-green focus:border-transparent" placeholder="Any additional information or questions..."></textarea>
+          </div>
+          <button type="submit" class="w-full bg-devops-green text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-green-600 transition-colors">
+            <i class="fas fa-paper-plane mr-2"></i>Submit Payment Confirmation
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Smart Tools Section -->
+  <section id="tools" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-devops-dark mb-4">Smart Learning Tools</h2>
+        <p class="text-gray-600 text-lg">AI-powered tools to accelerate your DevOps learning journey</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-devops-green rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-robot text-white text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-devops-dark mb-4">DevOps Q&A Bot</h3>
+            <p class="text-gray-600 mb-6">Get instant answers to your DevOps questions. Our AI bot is trained on industry best practices and can help with troubleshooting, concepts, and implementation guidance.</p>
+            <button class="bg-devops-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors">
+              <i class="fas fa-comments mr-2"></i>Ask Questions
+            </button>
+            <div class="mt-4 text-sm text-gray-500">
+              <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-devops-green rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-project-diagram text-white text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-devops-dark mb-4">Project Generator</h3>
+            <p class="text-gray-600 mb-6">Generate custom DevOps projects based on your skill level and interests. Practice with real-world scenarios and build your portfolio.</p>
+            <button class="bg-devops-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors">
+              <i class="fas fa-magic mr-2"></i>Generate Project
+            </button>
+            <div class="mt-4 text-sm text-gray-500">
+              <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-devops-dark text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <div class="flex items-center mb-4">
+            <i class="fas fa-code-branch text-devops-green text-2xl mr-3"></i>
+            <span class="text-xl font-bold">DevOps Mentorship</span>
+          </div>
+          <p class="text-gray-400">Empowering the next generation of DevOps professionals through personalized mentorship and hands-on learning.</p>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="#home" class="text-gray-400 hover:text-devops-green transition-colors">Home</a></li>
+            <li><a href="#upload" class="text-gray-400 hover:text-devops-green transition-colors">Upload Payment</a></li>
+            <li><a href="#tools" class="text-gray-400 hover:text-devops-green transition-colors">Smart Tools</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Contact</h4>
+          <div class="space-y-2">
+            <p class="text-gray-400"><i class="fas fa-envelope mr-2"></i>mohammad@devopsmentorship.com</p>
+            <p class="text-gray-400"><i class="fas fa-phone mr-2"></i>+1 (555) 123-4567</p>
+            <div class="flex space-x-4 mt-4">
+              <a href="#" class="text-gray-400 hover:text-devops-green transition-colors"><i class="fab fa-linkedin text-xl"></i></a>
+              <a href="#" class="text-gray-400 hover:text-devops-green transition-colors"><i class="fab fa-github text-xl"></i></a>
+              <a href="#" class="text-gray-400 hover:text-devops-green transition-colors"><i class="fab fa-twitter text-xl"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+        <p class="text-gray-400">&copy; 2024 DevOps Mentorship. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+<!-- Scripts -->
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Upload area logic
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const uploadContent = document.getElementById('upload-content');
+    const uploadProgress = document.getElementById('upload-progress');
+    const uploadSuccess = document.getElementById('upload-success');
+    const uploadError = document.getElementById('upload-error');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const fileName = document.getElementById('file-name');
+    const errorMessage = document.getElementById('error-message');
+    const selectedFileName = document.getElementById('selected-file-name');
+    let uploadedFile = null;
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('border-devops-green', 'bg-green-50');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('border-devops-green', 'bg-green-50');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('border-devops-green', 'bg-green-50');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) handleFile(files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    function resetUploadUI() {
+      uploadContent.classList.remove('hidden');
+      uploadProgress.classList.add('hidden');
+      uploadSuccess.classList.add('hidden');
+      uploadError.classList.add('hidden');
+      progressBar.style.width = '0%';
+      progressText.textContent = '0%';
+      fileName.textContent = '';
+      errorMessage.textContent = '';
+      selectedFileName.style.display = 'none';
+      selectedFileName.textContent = '';
+    }
+
+    function handleFile(file) {
+      resetUploadUI();
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      const maxSize = 10 * 1024 * 1024; // 10MB
+
+      if (!allowedTypes.includes(file.type)) {
+        uploadContent.classList.add('hidden');
+        uploadError.classList.remove('hidden');
+        errorMessage.textContent = 'Please upload a JPG, PNG, or PDF file.';
+        selectedFileName.style.display = 'none';
+        return;
+      }
+      if (file.size > maxSize) {
+        uploadContent.classList.add('hidden');
+        uploadError.classList.remove('hidden');
+        errorMessage.textContent = 'File size must be less than 10MB.';
+        selectedFileName.style.display = 'none';
+        return;
+      }
+      uploadedFile = file;
+      // Show file name immediately
+      selectedFileName.textContent = `File selected to upload is: ${file.name}`;
+      selectedFileName.style.display = 'block';
+      uploadContent.classList.remove('hidden');
+      uploadSuccess.classList.add('hidden'); // Hide success until upload
+      uploadError.classList.add('hidden');
+    }
+
+    // Form submission logic
+    document.getElementById('upload-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+
+      if (!fullName || !email) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      if (!uploadedFile) {
+        alert('Please upload a payment screenshot before submitting.');
+        return;
+      }
+
+      // Show progress bar
+      uploadSuccess.classList.add('hidden');
+      uploadError.classList.add('hidden');
+      uploadProgress.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      progressText.textContent = '0%';
+
+      try {
+        // Step 1: Get presigned URL
+        const apiUrl = "https://0jwmlx4c0a.execute-api.us-east-1.amazonaws.com/generate-presigned-url";
+        const presignRes = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: uploadedFile.name,
+            contentType: uploadedFile.type,
+            fullName,
+            email,
+            notes
+          })
+        });
+        const presignData = await presignRes.json();
+        if (!presignRes.ok) throw new Error(presignData.message || "Failed to get presigned URL");
+        const uploadUrl = presignData.uploadUrl;
+
+        // Step 2: Upload to S3 using presigned URL with progress
+        await uploadFileWithProgress(uploadUrl, uploadedFile, uploadedFile.type);
+
+        // Show success
+        uploadProgress.classList.add('hidden');
+        uploadSuccess.classList.remove('hidden'); // Show success after upload
+        fileName.textContent = uploadedFile.name;
+        selectedFileName.style.display = 'none';
+        uploadedFile = null;
+        // Optionally, reset form fields
+        // document.getElementById('upload-form').reset();
+      } catch (err) {
+        uploadProgress.classList.add('hidden');
+        uploadError.classList.remove('hidden');
+        errorMessage.textContent = "Upload failed: " + err.message;
+      }
+    });
+
+    // Helper to upload file with progress
+    function uploadFileWithProgress(url, file, contentType) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", url, true);
+        xhr.setRequestHeader("Content-Type", contentType);
+        xhr.upload.onprogress = function (e) {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = percent + '%';
+            progressText.textContent = percent + '%';
+          }
+        };
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            progressBar.style.width = '100%';
+            progressText.textContent = '100%';
+            resolve();
+          } else {
+            reject(new Error("File upload failed"));
+          }
+        };
+        xhr.onerror = function () {
+          reject(new Error("File upload failed"));
+        };
+        xhr.send(file);
+      });
+    }
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+        // Close mobile menu if open
+        mobileMenu.classList.add('hidden');
+      });
+    });
+  </script>
+
+  <script>
+    function showBotInfo(userType) {
+      let response = '';
+
+      if (userType === 'student') {
+        response = `
+          <h3><strong>For Students</strong> </h3>
+          <p><u>Relevant Skillset:</u> Beginner-friendly curriculum. No background in IT needed.</p>
+          <p><u>Programming Knowledge:</u> Having prior knowledge in Bash or Python is beneficial, but we teach from scratch.</p>
+        `;
+      } else if (userType === 'nonit') {
+        response = `
+          <h3><strong>For Non-IT Professionals</strong> </h3>
+          <p><u>Relevant Skillset:</u> This course is tailored for career transitions. It starts with the basics.</p>
+          <p><u>Programming Knowledge:</u> Prior experience is helpful but not required — we guide you through everything.</p>
+        `;
+      } else if (userType === 'it') {
+        response = `
+          <h3><strong>For IT Professionals</strong> </h3>
+          <p><u>Relevant Skillset:</u> Advanced modules available to upskill and transition to DevOps roles.</p>
+          <p><u>Programming Knowledge:</u> Bash, Python, and scripting knowledge will help you fast-track your learning.</p>
+        `;
+      }
+
+    document.getElementById('bot-response').innerHTML = response;
+  }
+</script>
+</body>
+</html>

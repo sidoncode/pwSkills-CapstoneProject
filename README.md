@@ -1,299 +1,155 @@
-# DevOps Accelerator: End-to-End Cloud-Native Project
+# DevOps Accelerator — Step-by-Step Deployment Tutorial
 
-A fully integrated DevOps project simulating real-world CI/CD workflows, infrastructure provisioning, monitoring, and automation — built for aspiring DevOps engineers.
+A practical, corrected walkthrough for deploying the `pwSkills-CapstoneProject`
+(DevOps Accelerator) into **your own AWS account**.
 
----
-
-## Project Overview
-
-This DevOps Accelerator enables users to
-- Upload input files through a frontend hosted on S3 + CloudFront
-- Automatically trigger processing via Lambda and S3 events
-- Use pre-signed URLs for secure uploads
-- Deploy and manage infrastructure using Terraform
-- Automate pipelines via GitHub Actions
-- Monitor health and logs via CloudWatch
+This guide is based on the actual Terraform, Lambda, and GitHub Actions code in
+the repo — not just the README — and fixes a few hardcoded values and ordering
+issues that will otherwise break the deployment.
 
 ---
 
-## The flow (How It Works)
-
-1. User visits frontend site through browser.
-2. Navigates through all the sections.
-3. Makes the payment and uploads the screenshot / .pdf file.
-3. Uploaded input file is converted to pre-signed URL and placed in S3 bucket.
-4. S3 event triggers → Lambda execution.
-5. Lambda processes the file and logs the result in CloudWatch.
-6. SNS alert sent to the owner after successful processing.
-
----
-
-
-## Tech Stack
-
-| Layer             | Tools & Services                        |
-|------------------|------------------------------------------|
-| Frontend         | HTML/CSS + S3 + CloudFront               |
-| Backend (Event)  | AWS Lambda (Python)              |
-| Infrastructure   | Terraform (modular setup & remote backend)                |
-| CI/CD            | GitHub Actions (Workflows & Triggers)    |
-| Monitoring       | CloudWatch (Logs, Alarms, Dashboard)     |
-| Notification     | SNS (Email alerts for file uploads)      |
-| Security         | IAM Roles, Policies, Bucket Permissions  |
-
----
-
-
-## What's covered in this DevOps Accelerator Platform
-
-
-#### Infrastructure Auto-Provisioning with Terraform
-
-- Automated infra management using Terraform.
-
-- Remote backend configured with S3 for state file and DynamoDB for state locking.
-
-
-#### End-to-End CI/CD Automation with GitHub Actions
-
-- Fully automated workflows for:
-	
-	- Frontend deployment (S3 + CloudFront)
-	
-	- Backend Lambda packaging & deployment
-	
-	- Terraform infrastructure provisioning
-	
-- Separate pipelines for each component.
-
-
-#### Cloud-Native Hosting (No Server Management Needed)
-
-- Static frontend hosted on S3 + CloudFront CDN for global delivery.
-
-- Backend logic served through AWS Lambda using REST APIs.
-
-- Everything is serverless-first, cost-efficient, and easily scalable.
-
-
-#### Secure File Upload Workflow Using Pre-Signed URLs
-
-- Users securely upload files using pre-signed S3 URLs.
-
-- Upload triggers processing Lambda without exposing S3 directly.
-
-
-#### Automated Monitoring & Alerting
-
-- AWS CloudWatch monitors backend Lambda executions.
-
-- AWS SNS notifies on every successful file processing event.
-
-- Auto-alerts configured for error detection and operational visibility.
-
-
-#### Modular Gigs to Extend the Platform
-
-- Easily extendable with plug-and-play gig modules like:
-
-	- Project Generator
-
-	- QA Bot
-
-- New gigs can be added without disrupting the core pipeline.
-
-
-#### Organized Folder Structure for Scalability
-
-- Clean, modular repo layout separating infra, frontend, backend, and workflows.
-
-- Easy to replicate in other AWS accounts.
-
-
----
-
-
-## Folder Structure
+## 1. What you are building (architecture)
 
 ```
-DevOps-Accelerator-Project
-├── .github
-│   └── workflows
-│       ├── backend-deploy.yml
-│       ├── frontend.yml
-│       └── terraform.yml
-├── backend
-│   └── lambda
-│       ├── generate-presigned-url
-│       │   ├── lambda.zip
-│       │   └── main.py
-│       └── process-uploaded-file
-│           ├── lambda.zip
-│           └── main.py
-├── frontend
-│   └── index.html
-├── gigs
-│   ├── project-generator
-│   └── qa-bot
-├── infra
-│   └── terraform
-│       ├── main.tf
-│       ├── outputs.tf
-│       ├── terraform.tfvars
-│       └── variables.tf
-└── README.md
-└── .gitignore
+                    ┌─────────────┐
+   Browser ───────► │ CloudFront  │ ──► S3 (frontend bucket: static HTML)
+                    └─────────────┘
 
+   Browser ──POST──► API Gateway ──► presign Lambda ──► returns pre-signed S3 URL
+                                          (generate-presigned-url)
+
+   Browser ──PUT file──► S3 (upload bucket)
+                              │
+                              │  s3:ObjectCreated event
+                              ▼
+                         process Lambda ──► CloudWatch logs
+                         (process-uploaded-file) ──► SNS ──► email to you
 ```
 
-## Deployment Instructions
-
-### 1. Prerequisites
-
-- AWS CLI configured locally (`aws configure`)
-
-- Terraform should be installed
-
-- Node.js or Python (depending on Lambda)
-
-- GitHub repository created (for CI/CD)
-
-
-### 2. Infrastructure Setup with Terraform
-
-- Always navigate to the terraform folder when running below commands in same sequence:
-	- `terraform init`
-	
-		-  To initialize and setup everything. [*Need to run this whenever new changes are made to terraform files or its dependent resources like lambda folders in backend.*]
-	- `terraform validate`
-		- To verify if the configs are corrected defined or not.
-	- `terraform plan`
-		- To confirm what all resources are going to be built.
-
-	#### Important note: 
-	- Do NOT run `terraform apply`locally.  
-	- Need all changes to go through CI/CD so we push to remote directly and apply will run through pipeline.
-
-
-### 3. GitHub Actions CI/CD
-
-- CI/CD runs on push to `main` branch.
-
-- Auto-deploys updated Lambda code (backend), terraform scripts or frontend.
-
-- Uses GitHub Secrets to authenticate with AWS
-
+**Provisioning:** Terraform, with a remote backend (S3 for state + DynamoDB for locking).
+**CI/CD:** 3 GitHub Actions workflows — `terraform.yml`, `backend-deploy.yml`, `frontend.yml`.
 
 ---
 
-### 4. Deployment Execution guidance
-````md
-If you'd like to replicate this project [DevOps Accelerator] on your own AWS account, follow the detailed steps below.
+## 2. Prerequisites
+
+Install / have ready:
+
+- An **AWS account** with admin access
+- **AWS CLI v2** — verify: `aws --version`
+- **Terraform v1.5+** — verify: `terraform -version`
+- **Git** + a **GitHub account**
+- `zip` available on your machine (Linux/macOS have it; on Windows use WSL or Git Bash)
+
+> 💡 This project creates billable resources (CloudFront, API Gateway, Lambda, S3,
+> SNS). Costs are small but **not zero**. See **Section 14 (Teardown)** to remove
+> everything when you're done.
 
 ---
 
-##  Prerequisites
+## 3. Get the code into your own GitHub repo
 
-- AWS Account (with Administrator Access)
-- AWS CLI installed (`aws configure` will be used)
-- Git & GitHub account
-- Terraform v1.3+ installed
-- Node.js (for future extensibility)
+You need the code in **your** GitHub account so GitHub Actions can run with your secrets.
 
----
-
-##  Set Up AWS Credentials
-
-1. Log into AWS Console → IAM → **Create User**
-2. After user creation, under the **Users** tab:
-   - Click your newly created user
-   - Go to **Security credentials** → Create **Access Key**
-   - Skip tags, **download the CSV** (Important: don’t close until downloaded)
-3. Assign permissions:
-   - Go to **Permissions** → Add permissions
-   - Choose **Attach policies directly**
-   - Search for `AdministratorAccess` and attach
-4. In terminal, run:
-   ```bash
-   aws configure
-````
-
-* Enter Access Key ID and Secret Key from the CSV
-* Leave region/format blank (or use `us-east-1`)
-
----
-
-##  Clone the DevOps Accelerator Repository
+The cleanest path is to **fork** the original repo on GitHub
+(`sidoncode/pwSkills-CapstoneProject`) using the "Fork" button, then clone your fork:
 
 ```bash
-mkdir my-devops-project && cd my-devops-project
-git init
-git clone git@github.com:Anees-DevOps/devops-accelerator.git .
+git clone https://github.com/<your-username>/pwSkills-CapstoneProject.git
+cd pwSkills-CapstoneProject
+```
+
+> ⚠️ The README's `git clone git@github.com:Anees-DevOps/devops-accelerator.git`
+> line points at an unrelated repo — ignore it. Use your fork instead.
+
+---
+
+## 4. Set up AWS credentials
+
+1. AWS Console → **IAM** → **Users** → **Create user**.
+2. Open the user → **Security credentials** → **Create access key** →
+   choose "Command Line Interface (CLI)" → **download the `.csv`**.
+3. **Permissions** → Add permissions → Attach policies directly →
+   attach **`AdministratorAccess`** (fine for a learning project).
+4. Configure the CLI locally:
+
+```bash
+aws configure
+# AWS Access Key ID:     <from the CSV>
+# AWS Secret Access Key: <from the CSV>
+# Default region name:   us-east-1
+# Default output format: json
+```
+
+5. Confirm it works:
+
+```bash
+aws sts get-caller-identity
 ```
 
 ---
 
-## Set Up GitHub Repository
+## 5. Customize the hardcoded values (the most important step)
 
-1. Create a new GitHub repo (do **not** initialize with README).
-2. Add your new repo as remote origin:
+The repo ships with the author's own names baked in. **S3 bucket names are globally
+unique across all AWS accounts**, so you MUST change them or `apply` will fail.
 
-   ```bash
-   git remote add origin git@github.com:your-username/your-repo.git
-   ```
+### 5a. Pick three unique bucket names
 
----
+Decide on three globally-unique names now (add random characters to be safe):
 
-##  Add GitHub Repository Secrets
+| Purpose                | Example name                                  |
+| ---------------------- | --------------------------------------------- |
+| Terraform state bucket | `myname-devops-acc-tfstate-7x9k`              |
+| Upload bucket          | `myname-devops-acc-upload-7x9k`               |
+| Frontend hosting bucket| `myname-devops-acc-frontend-7x9k`             |
 
-Go to:
-**GitHub → Repo → Settings → Secrets → Actions → New repository secret**
+### 5b. Edit `infra/terraform/main.tf` — the backend block
 
-| Secret Name             | Value / Description                               |
-| ----------------------- | ------------------------------------------------- |
-| `AWS_ACCESS_KEY_ID`     | Your AWS IAM access key                           |
-| `AWS_SECRET_ACCESS_KEY` | Your AWS IAM secret key                           |
-| `AWS_REGION`            | `us-east-1`                                       |
-| `LAMBDA_FUNCTION_NAME`  | `process-uploaded-file`                           |
-| `FRONTEND_BUCKET_NAME`  | e.g. `devops-accelerator-frontend-hosting-bucket` |
-| `UPLOAD_BUCKET_NAME`    | e.g. `devops-accelerator-upload-bucket`           |
+Open `infra/terraform/main.tf` and update the **backend "s3"** block at the top so
+the `bucket` matches the state-bucket name you chose. Keep the DynamoDB table name
+or change it (just stay consistent with Step 6):
 
- **Later (after Terraform apply):**
-
-* Add `CLOUDFRONT_DIST_ID` (found in AWS → CloudFront → Distributions)
-
-#### Important Note:
-* S3 bucket names have to be *globally unique*, make sure to **change your bucket name while trying to pushing the changes** for the 1st time. Other services like lambda/cloudfront/dynamoDB etc can have same names if AWS account is different.
-
----
-
-##  Prepare Lambda Deployments
-
-Since Lambda code is already hardcoded in Terraform, zip the contents to deploy manually:
-
-```bash
-cd backend/lambda/process-uploaded-file
-zip -r lambda.zip .
-
-cd ../generate-presigned-url
-zip -r lambda.zip .
+```hcl
+  backend "s3" {
+    bucket         = "myname-devops-acc-tfstate-7x9k"   # <-- your state bucket
+    key            = "global/devops-accelerator/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "devops-accelerator-tf-locker"     # <-- match Step 6
+    encrypt        = true
+  }
 ```
 
->  After any change to `main.py`, **delete the old `lambda.zip`** and re-zip before pushing.
+### 5c. Edit `infra/terraform/terraform.tfvars`
+
+Replace every value with your own:
+
+```hcl
+aws_region             = "us-east-1"
+upload_bucket_name     = "myname-devops-acc-upload-7x9k"
+frontend_bucket_name   = "myname-devops-acc-frontend-7x9k"
+cloudfront_price_class = "PriceClass_100"
+notification_email     = "you@example.com"   # <-- YOUR email for SNS alerts
+```
+
+> The `notification_email` is a **required** Terraform variable. AWS will send a
+> subscription-confirmation email here — you must click it later (Step 11).
 
 ---
 
-##  Create Terraform State Infrastructure (Manually)
+## 6. Create the Terraform remote-backend resources manually
 
-These resources are required **before** `terraform init`:
+The backend (state bucket + lock table) must exist **before** `terraform init`.
+Terraform can't create the bucket that stores its own state, so do it by hand once:
 
 ```bash
-# Create S3 bucket for Terraform state
+# State bucket — name MUST match the backend block in main.tf (Step 5b)
 aws s3api create-bucket \
-  --bucket devops-accelerator-platform-tf-state \
+  --bucket myname-devops-acc-tfstate-7x9k \
   --region us-east-1
 
-# Create DynamoDB table for state locking
+# DynamoDB lock table — name MUST match dynamodb_table in main.tf
 aws dynamodb create-table \
   --table-name devops-accelerator-tf-locker \
   --attribute-definitions AttributeName=LockID,AttributeType=S \
@@ -302,173 +158,370 @@ aws dynamodb create-table \
   --region us-east-1
 ```
 
+> Note: for regions other than `us-east-1`, `create-bucket` needs
+> `--create-bucket-configuration LocationConstraint=<region>`. Staying in
+> `us-east-1` keeps things simplest.
+
 ---
 
-##  Run Terraform Commands
+## 7. Package the Lambda functions
+
+Terraform references a `lambda.zip` inside each Lambda folder. Re-create them so
+they contain your current code:
+
+```bash
+cd backend/lambda/process-uploaded-file
+rm -f lambda.zip
+zip -r lambda.zip main.py
+
+cd ../generate-presigned-url
+rm -f lambda.zip
+zip -r lambda.zip main.py
+
+cd ../../..   # back to repo root
+```
+
+> 🔁 Any time you edit a Lambda's `main.py`, delete the old `lambda.zip` and re-zip
+> before pushing — Terraform deploys whatever is in the zip.
+
+---
+
+## 8. Validate Terraform locally (do NOT apply locally)
+
+This project's rule: **never run `terraform apply` from your laptop** — all applies
+go through the CI/CD pipeline. Locally you only initialize, validate, and preview:
 
 ```bash
 cd infra/terraform
-terraform init
-terraform validate
-terraform plan
+terraform init        # connects to your remote backend (Step 6)
+terraform validate    # checks syntax/config
+terraform plan        # previews what will be created
+cd ../..
 ```
 
-If successful:
-
-```bash
-git push -u origin main
-```
+If `plan` runs cleanly and lists the resources to be created, you're good.
 
 ---
 
-##  Git Push Troubleshooting (File Size Errors)
+## 9. Add GitHub repository secrets
 
-If you hit a `.terraform/` size error:
+In **GitHub → your repo → Settings → Secrets and variables → Actions →
+New repository secret**, add:
+
+| Secret name             | Value                                               |
+| ----------------------- | --------------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | from your IAM CSV                                   |
+| `AWS_SECRET_ACCESS_KEY` | from your IAM CSV                                   |
+| `AWS_REGION`            | `us-east-1`                                          |
+| `LAMBDA_FUNCTION_NAME`  | `process-uploaded-file`                              |
+| `UPLOAD_BUCKET_NAME`    | your upload bucket (matches `tfvars`)               |
+| `FRONTEND_BUCKET_NAME`  | your frontend bucket (matches `tfvars`)             |
+
+> `CLOUDFRONT_DIST_ID` is added **later** (Step 12) — it doesn't exist until after
+> the first Terraform apply.
+
+---
+
+## 10. First push → run the Terraform pipeline
+
+Commit your customized files and push to `main`:
+
+```bash
+git add .
+git commit -m "Customize for my AWS account"
+git push origin main
+```
+
+Go to **GitHub → Actions**. Three workflows can trigger:
+
+- **Terraform Deploy** — runs on every push; this is the one that builds all infra.
+- **Deploy Backend Lambda** — runs only when `backend/lambda/process-uploaded-file/**` changes.
+- **Deploy Frontend** — runs only when `frontend/**` changes.
+
+On this first push, let the **Terraform Deploy** job finish successfully. It runs
+`init -reconfigure`, `plan`, then `apply -auto-approve` and creates everything:
+buckets, both Lambdas, API Gateway, CloudFront, SNS, IAM, CloudWatch.
+
+> ⚠️ The **Deploy Frontend** workflow will likely **fail on this first push**
+> because `CLOUDFRONT_DIST_ID` isn't set yet. That's expected — you'll fix it in
+> the next step and re-run it.
+
+### Push troubleshooting (`.terraform/` too large)
+
+If git rejects the push due to a large `.terraform/` directory:
 
 ```bash
 echo ".terraform/" >> .gitignore
 git rm -r --cached infra/terraform/.terraform
-git commit -m "Remove .terraform directory"
+git commit -m "Ignore .terraform directory"
+git push origin main
 ```
 
-If file is still too large (over 100MB):
+---
+
+## 11. Read the Terraform outputs & confirm SNS
+
+After the Terraform job succeeds, get the outputs. Either open the **Terraform Apply**
+step log in the Actions run, or run locally:
 
 ```bash
-# macOS
-brew install git-filter-repo
-
-# Ubuntu/Linux
-sudo apt update
-sudo apt install python3-pip -y
-pip3 install git-filter-repo
-
-git filter-repo --force --path infra/terraform/.terraform/ --invert-paths
-
-# Reconnect your repo
-git remote add origin git@github.com:your-username/your-repo.git
-git push --force --set-upstream origin main
+cd infra/terraform
+terraform output
+cd ../..
 ```
 
->  Future pushes may hit the same issue. Either:
->
-> * Use `git filter-repo` + force push
-> * Or manually delete the `.terraform/` folder each time before pushing
-
----
-
-##  Validate Your Deployment
-
-After pushing, GitHub Actions will automatically:
-
-* Deploy frontend to **S3 + CloudFront**
-* Deploy backend Lambda functions
-* Set up Terraform-managed infrastructure
-
-Check:
-
-* **GitHub → Actions** tab to confirm build success
-
-Sample output from Terraform:
+You'll see something like:
 
 ```
-Outputs:
-cloudfront_url = "d246o7opnvxl8.cloudfront.net"
-frontend_bucket_name = "devops-accelerator-frontend-hosting-bucket"
-lambda_function_name = "process-uploaded-file"
-presigned_url_api_endpoint = "https://0jwmlx4c0a.execute-api.us-east-1.amazonaws.com"
+cloudfront_url             = "dxxxxxxxxxxxxx.cloudfront.net"
+frontend_bucket_name       = "myname-devops-acc-frontend-7x9k"
+presigned_url_api_endpoint = "https://xxxxxxxx.execute-api.us-east-1.amazonaws.com"
+lambda_function_name       = "process-uploaded-file"
 ```
 
- Replace any **placeholder URLs** in your project with the real ones above.
-Then push the updated changes again.
+Now **check your email inbox** for an *AWS Notification — Subscription Confirmation*
+message and click **Confirm subscription**. Without this you won't get upload alerts.
 
 ---
 
-##  Verify Resources in AWS Console
+## 12. Wire up the frontend (CloudFront ID + API endpoint)
 
-You should now see the following:
+Two things must be set now that the infra exists:
 
-* **3 S3 Buckets**:
+**12a. Add the CloudFront secret.** In AWS Console → CloudFront → Distributions,
+copy the **ID** (e.g. `E1ABCDEF2GHIJ`) of the new distribution. Add it as a GitHub
+secret:
 
-  * Terraform state
-  * Frontend hosting
-  * File upload
+| Secret name          | Value                    |
+| -------------------- | ------------------------ |
+| `CLOUDFRONT_DIST_ID` | your distribution ID     |
 
-* **2 Lambda Functions**:
+**12b. Point the frontend at your real API.** Open `frontend/index.html` and find
+the placeholder API URL used for the upload request. Replace it with your real
+`presigned_url_api_endpoint` from Step 11, appending the route, e.g.:
 
-  * `generate-presigned-url`
-  * `process-uploaded-file`
+```
+https://xxxxxxxx.execute-api.us-east-1.amazonaws.com/generate-presigned-url
+```
 
-* **1 API Gateway** with POST method
+**12c. Re-push to deploy the frontend:**
 
-* **1 SNS Topic** (`devops-accelerator-upload-notification-topic`)
+```bash
+git add frontend/index.html
+git commit -m "Set real API endpoint in frontend"
+git push origin main
+```
 
-  * Check your inbox and **confirm subscription**
-
-* **1 CloudFront Distribution**
-
-  * This hosts your website
-
->  Tip: In AWS Console, double-click the "Created" column to sort newest resources on top.
-
----
-
-##  Final Testing
-
-### 1. Open Website via CloudFront
-
-Copy the `cloudfront_url` from Terraform output, prefix with `https://`, and paste in your browser.
+This time the **Deploy Frontend** workflow should run cleanly: it syncs
+`frontend/` to your S3 bucket and invalidates the CloudFront cache.
 
 ---
 
-### 2. Update API Gateway Throttling
+## 13. Test the full flow
 
-AWS Console → API Gateway:
+1. Open `https://<your-cloudfront_url>` in a browser.
+2. (Optional) In AWS Console → **API Gateway** → your API → **Throttling**, set the
+   default-stage **Burst = 100**, **Rate = 200**, save, wait ~2 min. This avoids the
+   default very-low throttle blocking your first upload.
+3. On the site, fill in the form and **upload a JPG / PNG / PDF**.
+4. Verify it landed: AWS Console → **S3** → your upload bucket → you should see a
+   new object named `<uuid>_<filename>`.
+5. Check the processing Lambda's logs: AWS Console → **Lambda** →
+   `process-uploaded-file` → **Monitor** → **View CloudWatch logs**. You should see
+   "New file uploaded" and "SNS notification sent successfully."
+6. Check your **email** — you should receive the "New File Uploaded" SNS alert.
 
-* Select your API
-* Left panel → **Protect** → Throttling
-* Edit **Default Stage**:
-
-  * **Burst limit**: `100`
-  * **Rate limit**: `200`
-* Save changes and wait 2 minutes
-
----
-
-### 3. Upload File (JPG/PNG/PDF)
-
-Visit your CloudFront-hosted site and upload a file.
-If upload fails:
-
-* Increase burst/rate limits
-* After success, **reduce both limits back to 0** (to avoid costs)
+> The `process-uploaded-file` Lambda only accepts `.jpg`, `.jpeg`, `.png`, `.pdf`.
+> Other extensions are logged and rejected by design.
 
 ---
 
-### 4. Check CloudWatch Logs
+## 14. Debugging the upload — "Upload failed: Failed to fetch"
 
-Go to AWS Console → Lambda → `process-uploaded-file`:
+`Failed to fetch` is a **browser-side** error: a network request never completed
+(bad URL, blocked by CORS, or a non-2xx preflight). It is *not* a normal server
+error response. The upload flow makes **two** browser→cloud calls, and either can
+throw this, so the first job is to find out **which one** failed.
 
-* Monitor → View Logs in CloudWatch
-* Check logs for uploaded file info
+### 14.0 — Find which call failed
 
-> For additional metadata (name/email), repeat with `generate-presigned-url` Lambda
+Open the site → **F12** → **Console** + **Network** tabs → retry the upload. Look at
+the red/failed request:
+
+- Failing on **`.../generate-presigned-url`** → it's the **API call** → see 14.1.
+- Failing on a **`PUT` to your S3 upload bucket** → it's the **upload step** → see 14.2.
+
+A real example of the console message that points to the API call:
+
+```
+Access to fetch at '.../generate-presigned-url' from origin
+'https://xxxx.cloudfront.net' has been blocked by CORS policy:
+Response to preflight request doesn't pass access control check:
+It does not have HTTP ok status.
+```
+
+> ⚠️ "blocked by CORS policy" does **not** always mean CORS is misconfigured. It
+> often means the preflight got a **non-2xx status** (e.g. a 429 throttle) and the
+> browser reports that *as* a CORS failure. Always check the actual status before
+> assuming CORS is broken — see 14.1.
+
+### 14.1 — API call fails (`/generate-presigned-url`)
+
+**Test the preflight directly** (curl ignores CORS, so it shows the raw truth —
+status line *and* headers). Use your own endpoint + CloudFront origin:
+
+```bash
+curl -i -X OPTIONS https://<API_ID>.execute-api.us-east-1.amazonaws.com/generate-presigned-url \
+  -H "Origin: https://<your-cloudfront-domain>" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: content-type" --no-cli-pager
+```
+
+Read the **first line** of the response:
+
+**Case A — `HTTP/2 429` (and CORS headers ARE present).**
+This is **throttling**, not CORS. The API Gateway throttle is set to 0 / near-zero,
+so every request (preflight included) is rejected with 429. Raise the limits:
+
+```bash
+API_ID=$(aws apigatewayv2 get-apis \
+  --query "Items[?Name=='DevOps-Accelerator-Presign-API'].ApiId" \
+  --output text --no-cli-pager)
+
+aws apigatewayv2 update-stage \
+  --api-id "$API_ID" \
+  --stage-name '$default' \
+  --default-route-settings ThrottlingBurstLimit=100,ThrottlingRateLimit=200 \
+  --no-cli-pager
+```
+
+(The single quotes around `'$default'` matter — it's the literal stage name, not a
+shell variable. The `$default` stage auto-deploys, so this takes effect in seconds.)
+Console equivalent: API Gateway → your API → **Protect → Throttling** → Default route
+→ Burst `100`, Rate `200`.
+
+**Case B — `404` / no `access-control-allow-*` headers.**
+CORS isn't being applied. Re-assert it on the API:
+
+```bash
+API_ID=$(aws apigatewayv2 get-apis \
+  --query "Items[?Name=='DevOps-Accelerator-Presign-API'].ApiId" \
+  --output text --no-cli-pager)
+
+aws apigatewayv2 update-api \
+  --api-id "$API_ID" \
+  --cors-configuration '{"AllowOrigins":["*"],"AllowMethods":["GET","POST","OPTIONS"],"AllowHeaders":["*"]}' \
+  --no-cli-pager
+```
+
+**Case C — `access-control-allow-origin` appears twice.**
+Duplicate CORS headers (API Gateway + the Lambda both add them) — browsers reject
+this. Rely on API Gateway for CORS and stop the Lambda from emitting its own
+`Access-Control-*` headers (or vice-versa), so only one layer sets them.
+
+Re-run the curl after the fix; the first line should be `200`/`204` with CORS
+headers present.
+
+### 14.2 — Upload step fails (`PUT` to the S3 upload bucket) — repo bug
+
+After the API returns a pre-signed URL, the browser does a direct `PUT` to the
+**upload** bucket. **The repo only adds CORS to the *frontend* bucket — the upload
+bucket gets none** — so that cross-origin `PUT` is blocked and you get
+`Failed to fetch` on the upload.
+
+**Immediate fix** (use your `upload_bucket_name`, *not* the frontend bucket):
+
+```bash
+aws s3api put-bucket-cors \
+  --bucket <YOUR_UPLOAD_BUCKET_NAME> \
+  --cors-configuration '{
+    "CORSRules": [
+      {
+        "AllowedHeaders": ["*"],
+        "AllowedMethods": ["PUT", "GET", "HEAD"],
+        "AllowedOrigins": ["*"],
+        "ExposeHeaders": [],
+        "MaxAgeSeconds": 3000
+      }
+    ]
+  }' --no-cli-pager
+
+# verify it stuck:
+aws s3api get-bucket-cors --bucket <YOUR_UPLOAD_BUCKET_NAME> --no-cli-pager
+```
+
+**Permanent fix** — add this to `infra/terraform/main.tf` and push, so a future
+`terraform apply` doesn't wipe the manual rule:
+
+```hcl
+resource "aws_s3_bucket_cors_configuration" "upload_cors" {
+  bucket = aws_s3_bucket.upload_bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "GET", "HEAD"]
+    allowed_origins = ["*"]
+    expose_headers  = []
+    max_age_seconds = 3000
+  }
+}
+```
+
+### 14.3 — After any fix
+
+Hard-refresh the site (**Cmd/Ctrl + Shift + R**) before retrying — the browser
+caches both the page and failed CORS preflights. Then re-run the upload.
+
+> The two fixes are independent and you may need **both**: 14.1 unblocks getting the
+> pre-signed URL; 14.2 unblocks the actual file `PUT`. Once both are in place the end
+> -to-end flow completes.
 
 ---
 
-### 5. Confirm Email Notification
+## 15. Teardown (do this to stop charges)
 
-If logs show file was processed, you should receive a confirmation email (via SNS Topic).
+Because applies run through CI/CD, the simplest clean teardown is locally with the
+same backend, then delete the manual backend resources:
+
+```bash
+cd infra/terraform
+terraform destroy        # type 'yes' to confirm
+cd ../..
+
+# Then remove the manually-created backend resources:
+aws s3 rb s3://myname-devops-acc-tfstate-7x9k --force
+aws dynamodb delete-table --table-name devops-accelerator-tf-locker --region us-east-1
+```
+
+> If `destroy` complains about non-empty S3 buckets, the upload/frontend buckets use
+> `force_destroy = true`, so Terraform should empty them automatically. If a bucket
+> still blocks, empty it in the console and re-run destroy.
 
 ---
 
-##  You're Done!
+## 16. Quick troubleshooting reference
 
-You’ve successfully deployed a **production-grade DevOps Accelerator**, with:
+| Symptom | Likely cause / fix |
+| ------- | ------------------ |
+| `BucketAlreadyExists` / `BucketAlreadyOwnedByYou` on apply | Bucket name not globally unique — change it in `tfvars` (and state bucket in `main.tf`). |
+| `terraform init`: "Backend configuration changed" / provider checksum mismatch | Stale `.terraform/` shipped in the repo — `rm -rf .terraform .terraform.lock.hcl` then `terraform init -reconfigure`. |
+| `terraform init` fails on backend | State bucket / DynamoDB table from Step 6 missing or names don't match `main.tf`. |
+| `apply` fails: `PutBucketPolicy ... AccessDenied ... BlockPublicPolicy` | Account-level S3 Block Public Access is on — disable it (`aws s3control put-public-access-block ... =false`), then re-run apply. |
+| Frontend workflow fails at "Invalidate CloudFront" | `CLOUDFRONT_DIST_ID` secret not set yet (Step 12a). |
+| `Upload failed: Failed to fetch` | See **Section 14** — most often a 429 throttle on the API (14.1) and/or missing CORS on the upload bucket (14.2). |
+| Preflight returns `429` (looks like a CORS error) | API Gateway throttle set to 0 — raise burst/rate (Section 14.1, Case A). |
+| No email received | SNS subscription not confirmed (Step 11), or wrong `notification_email` in `tfvars`. |
+| Lambda not triggering on upload | Confirm the S3 event notification + `aws_lambda_permission.allow_s3` applied; check the upload bucket is the one Terraform created. |
+| Push rejected: file too large | `.terraform/` got committed — see Step 10 troubleshooting. |
 
-*  Auto-scalable infrastructure (via Terraform)
-*  CI/CD pipelines (GitHub Actions)
-*  Lambda-powered backend (serverless)
-*  Frontend hosted via S3 + CloudFront
-*  Monitoring + Email notifications via CloudWatch + SNS
+---
+
+## 17. What you'll have learned
+
+By the end you've practiced the core DevOps loop end to end: **IaC** (Terraform with
+a remote, locked backend), **serverless app design** (API Gateway + two Lambdas +
+S3 events + SNS), **CI/CD** (three independent GitHub Actions pipelines triggered by
+path-scoped pushes), and **observability** (CloudWatch logs + email alerting) — all
+wired together so a single `git push` ships infrastructure, backend, and frontend.
 
 *Happy DevOps-ing!*
